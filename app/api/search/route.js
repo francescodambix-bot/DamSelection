@@ -27,8 +27,16 @@ async function getSessionCookies(domain) {
   const res = await fetch(`https://${domain}/`, {
     headers: { "User-Agent": USER_AGENT, "Accept-Language": "it-IT,it;q=0.9,en;q=0.8" },
   });
-  const setCookie = res.headers.get("set-cookie") || "";
-  const cookiePairs = setCookie.split(/,(?=[^;]+?=)/).map((c) => c.split(";")[0].trim()).filter(Boolean);
+  let cookiePairs = [];
+  if (typeof res.headers.getSetCookie === "function") {
+    cookiePairs = res.headers.getSetCookie().map((c) => c.split(";")[0].trim());
+  } else {
+    const setCookie = res.headers.get("set-cookie") || "";
+    cookiePairs = setCookie.split(/,(?=[^;]+?=)/).map((c) => c.split(";")[0].trim()).filter(Boolean);
+  }
+  if (cookiePairs.length === 0) {
+    throw new Error(`Nessun cookie di sessione ricevuto da ${domain} (status pagina iniziale: ${res.status}). Vinted potrebbe bloccare le richieste da questo server.`);
+  }
   return cookiePairs.join("; ");
 }
 
@@ -43,7 +51,15 @@ async function searchVinted(domain, cookies, query, page, perPage = 48) {
       "Referer": `https://${domain}/`,
     },
   });
-  if (!res.ok) throw new Error(`Vinted ha risposto ${res.status}`);
+  const contentType = res.headers.get("content-type") || "";
+  if (!contentType.includes("application/json")) {
+    const snippet = (await res.text()).slice(0, 200).replace(/\s+/g, " ");
+    throw new Error(`Vinted ha risposto con status ${res.status} e contenuto non-JSON (probabile blocco anti-bot). Anteprima risposta: "${snippet}"`);
+  }
+  if (!res.ok) {
+    const body = await res.text();
+    throw new Error(`Vinted ha risposto ${res.status}: ${body.slice(0, 200)}`);
+  }
   return res.json();
 }
 
