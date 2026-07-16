@@ -1,0 +1,65 @@
+VINTED ANALYTICS AI — VERSIONE ONLINE (con ricerca dal vivo)
+================================================================
+
+Cosa cambia rispetto a prima: dentro l'app c'è un bottone ⚡ "Cerca dal
+vivo su Vinted" nella sezione Ricerca AI. Cliccandolo, l'app cerca
+DAVVERO su Vinted in quel momento e mostra i risultati — niente più
+script da lanciare a mano o file da importare.
+
+Funziona SOLO dopo aver messo online questo progetto (Vercel). Dentro
+l'anteprima di Claude questo bottone mostrerà un messaggio che spiega
+che serve l'hosting vero.
+
+================================================================
+COME METTERLO ONLINE SU VERCEL (gratis) — la strada più semplice
+================================================================
+
+Ti serve un account GitHub (gratis) e un account Vercel (gratis,
+puoi accedere direttamente con GitHub).
+
+STEP 1 — Crea un account GitHub (se non ce l'hai già)
+   Vai su https://github.com/signup e segui la procedura.
+
+STEP 2 — Crea un nuovo repository
+   - Vai su https://github.com/new
+   - Dagli un nome, es. "vinted-analytics-ai"
+   - Lascialo "Public" o "Private", come preferisci
+   - NON aggiungere README/gitignore da lì (li abbiamo già)
+   - Clicca "Create repository"
+
+STEP 3 — Carica questi file nel repository
+   Nella pagina del repository appena creato, cerca il link
+   "uploading an existing file" (o "Add file" -> "Upload files").
+   Trascina TUTTA questa cartella (tutti i file e le sottocartelle:
+   app/, components/, package.json, next.config.js, .gitignore).
+   Poi in basso clicca "Commit changes".
+
+STEP 4 — Collega Vercel
+   - Vai su https://vercel.com/signup e registrati con GitHub
+     (bottone "Continue with GitHub")
+   - Una volta dentro, clicca "Add New..." -> "Project"
+   - Seleziona il repository che hai appena caricato
+   - Vercel riconosce da solo che è un progetto Next.js: non devi
+     cambiare nessuna impostazione
+   - Clicca "Deploy" e aspetta 1-2 minuti
+
+STEP 5 — Fatto
+   Vercel ti dà un link tipo https://vinted-analytics-ai-tuonome.vercel.app
+   Aprilo: è la tua app, online, con la ricerca dal vivo funzionante.
+
+================================================================
+SE VUOI AGGIORNARE L'APP IN FUTURO
+================================================================
+Ogni volta che carichi nuovi file nel repository GitHub (Step 3),
+Vercel aggiorna automaticamente il sito online da solo, in 1-2 minuti.
+Non devi rifare il resto della procedura.
+
+================================================================
+NOTE IMPORTANTI
+================================================================
+- La ricerca dal vivo usa un endpoint interno di Vinted, non una API
+  ufficiale: può smettere di funzionare se Vinted cambia qualcosa.
+- È pensata per uso personale, con ritmo prudente incorporato nel
+  codice: non modificarlo per renderlo più aggressivo, rischi di
+  farti bloccare da Vinted.
+- Sei responsabile tu del rispetto dei Termini di Servizio di Vinted.
