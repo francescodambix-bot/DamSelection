@@ -37,17 +37,24 @@ async function getSessionCookies(domain) {
   if (cookiePairs.length === 0) {
     throw new Error(`Nessun cookie di sessione ricevuto da ${domain} (status pagina iniziale: ${res.status}). Vinted potrebbe bloccare le richieste da questo server.`);
   }
-  return cookiePairs.join("; ");
+  const cookieHeader = cookiePairs.join("; ");
+  const tokenPair = cookiePairs.find((c) => c.startsWith("access_token_web="));
+  const accessToken = tokenPair ? tokenPair.split("=").slice(1).join("=") : null;
+  if (!accessToken) {
+    throw new Error(`Cookie access_token_web non trovato tra quelli ricevuti da ${domain}. Cookie ricevuti: ${cookiePairs.map((c) => c.split("=")[0]).join(", ")}`);
+  }
+  return { cookieHeader, accessToken };
 }
 
-async function searchVinted(domain, cookies, query, page, perPage = 48) {
+async function searchVinted(domain, session, query, page, perPage = 48) {
   const url = `https://${domain}/api/v2/catalog/items?page=${page}&per_page=${perPage}&search_text=${encodeURIComponent(query)}&order=newest_first`;
   const res = await fetch(url, {
     headers: {
       "User-Agent": USER_AGENT,
       "Accept": "application/json, text/plain, */*",
       "Accept-Language": "it-IT,it;q=0.9,en;q=0.8",
-      "Cookie": cookies,
+      "Cookie": session.cookieHeader,
+      "Authorization": `Bearer ${session.accessToken}`,
       "Referer": `https://${domain}/`,
     },
   });
@@ -142,13 +149,13 @@ export async function GET(request) {
   const domain = country === "it" ? "www.vinted.it" : `www.vinted.${country}`;
 
   try {
-    const cookies = await getSessionCookies(domain);
+    const session = await getSessionCookies(domain);
     const allItems = [];
 
     for (const q of queries) {
       const rawItems = [];
       for (let page = 1; page <= pages; page++) {
-        const data = await searchVinted(domain, cookies, q, page);
+        const data = await searchVinted(domain, session, q, page);
         const items = data.items || [];
         if (items.length === 0) break;
         rawItems.push(...items);
